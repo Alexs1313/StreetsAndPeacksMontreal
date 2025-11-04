@@ -1,28 +1,29 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import { NavigationContainer } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
+import StreetsAndPeacksStack from './StreetsAndPeacks/StreetsAndPeacksNavigation/StreetsAndPeacksStack';
+import { ContextProvider } from './StreetsAndPeacks/StreetsAndPeacksStore/StreetsAndPeacksContext';
+import StreetsAndPeacksLoader from './StreetsAndPeacks/StreetsAndPeacksComponents/StreetsAndPeacksLoader';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+const App = () => {
+  const [isVisibleLoader, setIsVisibleLoader] = useState(false);
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  useEffect(() => {
+    setTimeout(() => {
+      setIsVisibleLoader(true);
+    }, 5500);
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <NewAppScreen templateFileName="App.tsx" />
-    </View>
+    <NavigationContainer>
+      <ContextProvider>
+        {isVisibleLoader ? (
+          <StreetsAndPeacksStack />
+        ) : (
+          <StreetsAndPeacksLoader />
+        )}
+      </ContextProvider>
+    </NavigationContainer>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+};
 
 export default App;
