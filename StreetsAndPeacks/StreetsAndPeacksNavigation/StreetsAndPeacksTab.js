@@ -40,6 +40,7 @@ const StreetsAndPeacksTab = () => {
       <Tab.Screen
         name="StreetsAndPeacksMap"
         component={StreetsAndPeacksMap}
+        options={{ unmountOnBlur: true }}
         options={{
           tabBarIcon: ({ color, focused }) => (
             <View
@@ -111,6 +112,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#E39D20',
     paddingHorizontal: 6,
     height: 70,
+    borderTopWidth: 1,
+    borderTopColor: '#E39D20',
   },
   streetsnpeackswrapp: {
     padding: 15,

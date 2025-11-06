@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import StreetsAndPeacksBackground from '../StreetsAndPeacksComponents/StreetsAndPeacksBackground';
 
@@ -22,9 +29,16 @@ const StreetsAndPeacksWelcome = () => {
         <View
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
         >
-          <Image
-            source={require('../../assets/images/streetsnpeacksldrwlc.png')}
-          />
+          {Platform.OS === 'ios' ? (
+            <Image
+              source={require('../../assets/images/streetsnpeacksldrwlc.png')}
+            />
+          ) : (
+            <Image
+              source={require('../../assets/images/icomandr.png')}
+              style={{ width: 220, height: 220, borderRadius: 12 }}
+            />
+          )}
         </View>
       ) : (
         <View style={styles.streetsnpeackscnt}>
@@ -37,7 +51,9 @@ const StreetsAndPeacksWelcome = () => {
           </Text>
           {streetsAndPeacksSlide === 0 && (
             <Text style={styles.streetsnpeackstitle}>
-              STREETS & PEAKS: MONTREAL
+              {Platform.OS === 'ios'
+                ? 'STREETS & PEAKS: MONTREAL'
+                : 'MONTREAL LUXURY STREETS'}
             </Text>
           )}
           <Text style={styles.streetsnpeackssubtitle}>

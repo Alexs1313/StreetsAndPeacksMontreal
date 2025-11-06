@@ -11,26 +11,25 @@ import StreetsAndPeacksBackground from '../StreetsAndPeacksComponents/StreetsAnd
 import { useStore } from '../StreetsAndPeacksStore/StreetsAndPeacksContext';
 import StreetsAndPeacksCard from '../StreetsAndPeacksComponents/StreetsAndPeacksCard';
 import MapView, { Marker } from 'react-native-maps';
-import { streetsAndPeacksPlaces } from '../StreetsAndPeacksData/streetsAndPeacksPlaces';
 import { useFocusEffect } from '@react-navigation/native';
 import Orientation from 'react-native-orientation-locker';
 
 const { height } = Dimensions.get('window');
 
 export default function StreetsAndPeacksMap({ route }) {
-  const { completed = [] } = useStore() || {};
+  const { completed = [], places } = useStore() || {};
   const [selectedMarker, setSelectedMarker] = useState(null);
   const selectedPlace = route?.params?.place;
 
-  const unlockedPlaces = streetsAndPeacksPlaces.filter(
-    (_, index) => completed[index] === true,
-  );
+  const unlockedPlaces = places.filter((_, index) => completed[index] === true);
 
   useFocusEffect(
     useCallback(() => {
       Orientation.lockToPortrait();
 
-      return () => Orientation.unlockAllOrientations();
+      return () => {
+        Orientation.unlockAllOrientations(), setSelectedMarker(null);
+      };
     }, []),
   );
 
@@ -43,12 +42,11 @@ export default function StreetsAndPeacksMap({ route }) {
 
         <View style={{ flex: 1 }}>
           <MapView
+            key={selectedPlace ? 'selected' : 'unlocked'}
             userInterfaceStyle="dark"
             style={{ flex: 1 }}
             provider={Platform.OS === 'ios' ? 'google' : undefined}
-            onPress={() => {
-              if (selectedMarker !== null) setSelectedMarker(null);
-            }}
+            onPress={() => selectedMarker && setSelectedMarker(null)}
             initialRegion={{
               latitude: 45.5075,
               longitude: -73.5673,
@@ -56,13 +54,28 @@ export default function StreetsAndPeacksMap({ route }) {
               longitudeDelta: 0.12,
             }}
           >
-            {selectedPlace === undefined ? (
+            {selectedPlace ? (
+              <Marker
+                coordinate={selectedPlace.coords}
+                onPress={() =>
+                  selectedMarker
+                    ? setSelectedMarker(null)
+                    : setSelectedMarker(selectedPlace)
+                }
+              >
+                <Image
+                  source={require('../../assets/images/streetsnpeackslocmark.png')}
+                  style={{ width: 34, height: 34 }}
+                  resizeMode="contain"
+                />
+              </Marker>
+            ) : (
               unlockedPlaces.map(marker => (
                 <Marker
                   key={marker.id}
                   coordinate={marker.coords}
                   onPress={() =>
-                    selectedMarker !== null
+                    selectedMarker
                       ? setSelectedMarker(null)
                       : setSelectedMarker(marker)
                   }
@@ -74,21 +87,6 @@ export default function StreetsAndPeacksMap({ route }) {
                   />
                 </Marker>
               ))
-            ) : (
-              <Marker
-                coordinate={selectedPlace.coords}
-                onPress={() =>
-                  selectedMarker !== null
-                    ? setSelectedMarker(null)
-                    : setSelectedMarker(selectedPlace)
-                }
-              >
-                <Image
-                  source={require('../../assets/images/streetsnpeackslocmark.png')}
-                  style={{ width: 34, height: 34 }}
-                  resizeMode="contain"
-                />
-              </Marker>
             )}
           </MapView>
 
@@ -131,7 +129,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 115,
     alignSelf: 'center',
-    width: '80%',
+    width: '90%',
     zIndex: 2,
   },
 });

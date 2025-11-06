@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { streetsAndPeacksPlaces } from '../StreetsAndPeacksData/streetsAndPeacksPlaces';
+import { useFocusEffect } from '@react-navigation/native';
 export const StoreContext = createContext(undefined);
 
 export const useStore = () => {
@@ -69,42 +70,44 @@ export const ContextProvider = ({ children }) => {
     );
   };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const rawCompleted = await AsyncStorage.getItem(STORAGE_COMPLETED);
-        const rawSelected = await AsyncStorage.getItem(STORAGE_SELECTED);
-        const rawPlaces = await AsyncStorage.getItem(STORAGE_PLACES);
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        try {
+          const rawCompleted = await AsyncStorage.getItem(STORAGE_COMPLETED);
+          const rawSelected = await AsyncStorage.getItem(STORAGE_SELECTED);
+          const rawPlaces = await AsyncStorage.getItem(STORAGE_PLACES);
 
-        if (rawCompleted) {
-          const parsed = JSON.parse(rawCompleted);
-          if (Array.isArray(parsed)) setCompleted(parsed);
-        } else {
-          await AsyncStorage.setItem(
-            STORAGE_COMPLETED,
-            JSON.stringify(completed),
-          );
-        }
+          if (rawCompleted) {
+            const parsed = JSON.parse(rawCompleted);
+            if (Array.isArray(parsed)) setCompleted(parsed);
+          } else {
+            await AsyncStorage.setItem(
+              STORAGE_COMPLETED,
+              JSON.stringify(completed),
+            );
+          }
 
-        if (rawSelected) {
-          const si = parseInt(rawSelected, 10);
-          if (!isNaN(si)) setSelectedLevel(si);
-        }
+          if (rawSelected) {
+            const si = parseInt(rawSelected, 10);
+            if (!isNaN(si)) setSelectedLevel(si);
+          }
 
-        if (rawPlaces) {
-          const parsedPlaces = JSON.parse(rawPlaces);
-          if (Array.isArray(parsedPlaces)) setPlaces(parsedPlaces);
-        } else {
-          await AsyncStorage.setItem(
-            STORAGE_PLACES,
-            JSON.stringify(streetsAndPeacksPlaces),
-          );
+          if (rawPlaces) {
+            const parsedPlaces = JSON.parse(rawPlaces);
+            if (Array.isArray(parsedPlaces)) setPlaces(parsedPlaces);
+          } else {
+            await AsyncStorage.setItem(
+              STORAGE_PLACES,
+              JSON.stringify(streetsAndPeacksPlaces),
+            );
+          }
+        } catch (e) {
+          console.warn('failed', e);
         }
-      } catch (e) {
-        console.warn('failed', e);
-      }
-    })();
-  }, []);
+      })();
+    }, []),
+  );
 
   useEffect(() => {
     (async () => {
